@@ -8,8 +8,9 @@ Différences README.md avec copilot_instructions.md
 
 
 • Qu’ai-je appris ?
-
+    Nous avons appris les différentes commandes pour init une ia pour qu'elle aie le contexte générale du projet. Avec ceci elle a crée un fichier .md avec tout ce qu'elle a appris. Nous avons aussi appris qu'elle a fourni une analyse beaucoup plus détaillé que demandé. 
 • Qu’est-ce qui a bien fonctionné ?
-
+    Le init de l'ia cependant elle a quand même voulu déjà prendre les devant et installer playwrite et un serveur pour les tests e2e.
 • Qu’est-ce qui a moins bien fonctionné ?
+    Pour l'instant rien à signaler.
 
