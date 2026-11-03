@@ -9,6 +9,8 @@
 
 fichiers crée : 
 
+---     FRONTEND     ---
+
 useApplication.ts -> pour le contexte de l'app dans le frontend
 
 application.service.ts -> faire les fetch du back dans le front
@@ -35,6 +37,8 @@ application.mapper.ts -> transformation en differents models grâce au mapper
 
 
 fichiers modifiés :
+
+---     FRONTEND     ---
 
 guards.ts -> rajouté une validation pour verifier que le model correspond bien au model attendu
 
