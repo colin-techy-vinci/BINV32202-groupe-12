@@ -37,7 +37,10 @@ describe("OffersPage", () => {
   });
 
   it("adapte la description au profil", async () => {
-    stubFetch({ "/api/offers": () => Response.json([]) });
+    stubFetch({
+      "/api/offers": () => Response.json([]),
+      "/api/applications": () => Response.json([]),
+    });
 
     const { unmount } = render(
       <OffersPage user={studentUser} token="jeton" onUnauthorized={vi.fn()} />,
