@@ -131,3 +131,8 @@ correspondent pas à la technologie actuellement utilisée.
 
 Cet audit met à jour le rapport uniquement. Les guides de développement n’ont pas été
 modifiés.
+
+Token utilisé : 7%
+Token restant : 376 tokens restant
+
+IA utilisé : GPT-5.6 Luna
