@@ -9,7 +9,7 @@
 
 fichiers crée : 
 
----     FRONTEND     ---
+---     FRONTENDè²     ---
 
 useApplication.ts -> pour le contexte de l'app dans le frontend
 
