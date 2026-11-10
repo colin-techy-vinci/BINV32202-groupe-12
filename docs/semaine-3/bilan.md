@@ -77,3 +77,57 @@ Les tests ajoutés dans [`backend/tests/applications.test.ts`](../../backend/tes
 - le mapper ne conservait pas le statut `SELECTED` dans la réponse API.
 
 La suite ciblée a confirmé ces comportements dans l’état actuel sans modifier le code de production. Aucune vérification manuelle navigateur ou end-to-end n’a été nécessaire pour ces cas API ; la traduction frontend de « Retenue » reste une limite signalée ci-dessus.
+
+
+## Audit actualisé des guides par rapport aux attentes Web 2
+
+### Sources et périmètre
+
+Cette version utilise les notes S05 à S14 ci-dessus, qui prolongent les attentes S01 à
+S04. Les guides examinés sont [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md),
+[`README.md`](../../README.md), [`docs/architecture.md`](../architecture.md) et
+[`backend/API.md`](../../backend/API.md). Aucun `AGENTS.md` n’est présent dans le dépôt.
+Les PDF originaux ne sont pas versionnés ; les constats sont donc limités aux notes
+présentes ici et aux guides effectivement lisibles.
+
+| Attente Web 2 (source) | Guide examiné et passage | Correspondance | Écart ou recommandation |
+|---|---|---|---|
+| Exécuter le JavaScript au bon endroit et après le DOM ; distinguer navigateur, outils de développement et TypeScript (S05) | [`README.md`](../../README.md), démarrage Vite ; [`docs/architecture.md`](../architecture.md), découpage frontend/backend | **Partielle** : le rôle de Vite et du frontend est documenté, mais les guides ne précisent pas le chargement après le DOM ni la distinction JS navigateur/TypeScript. | Ajouter une note seulement si du JavaScript navigateur hors React est introduit ; ce n’est pas nécessaire pour le code React actuel. |
+| Utiliser `querySelector`, `querySelectorAll`, `classList`, `append`/`remove` et éviter `innerHTML` avec des données utilisateur (S05) | Aucun passage correspondant ; le frontend est React et les guides imposent l’architecture pages/hooks/components | **Non applicable pour l’implémentation actuelle** : aucun usage de ces APIs DOM ou de `innerHTML` n’a été trouvé dans `frontend/src`. | Ne pas ajouter des consignes DOM génériques au guide React ; conserver la règle XSS React ci-dessous. |
+| Utiliser `addEventListener`, `preventDefault`, bubbling et event delegation (S06) | Aucun passage correspondant ; [`docs/architecture.md`](../architecture.md), architecture React/MVVM | **Non applicable pour les composants React actuels** : les événements sont attachés par JSX (`onClick`, `onSubmit`), pas par listeners DOM impératifs. | Ajouter uniquement une règle React sur les handlers et `preventDefault` des formulaires, déjà pertinente en S12. |
+| Composants React nommés, un composant par fichier, JSX correct et React échappant le texte (S07) | [`docs/architecture.md`](../architecture.md), `components/` réutilisables et `pages/` ; [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md), clarté et réutilisation | **Oui sur la structure, partielle sur la sécurité** : les composants sont séparés dans `frontend/src/components`, mais l’échappement React et le nommage ne sont pas explicitement énoncés. Le code n’utilise pas `dangerouslySetInnerHTML`. | Préciser « ne pas utiliser `dangerouslySetInnerHTML` avec des données externes » et la convention un composant/fichier. |
+| Props typées, destructurées, immuables ; `children` pour les conteneurs (S08) | [`docs/architecture.md`](../architecture.md), flux pages → hooks → services → modèles et composants réutilisables ; [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md), type safety | **Partielle à bonne** : les composants ont des interfaces de props et `Layout` reçoit `children`, mais le guide ne demande pas explicitement la destructuration ni l’interdiction de modifier les props. | Ajouter ces conventions frontend au guide, notamment props en lecture seule et données descendantes. |
+| Assets, CSS local/global, styles calculés et `alt` (S09) | [`README.md`](../../README.md), « CSS simple » ; [`docs/architecture.md`](../architecture.md), composants ; `.vscode/settings.json`, environnement frontend | **Partielle** : aucun guide ne définit une convention assets/CSS ni une exigence `alt`. Le code actuel ne contient pas d’image applicative à auditer. | Ajouter une règle `alt` pour toute image et préciser la convention CSS si des composants réutilisables se multiplient. MUI n’est pas utilisé et ne doit pas être introduit artificiellement. |
+| `map`, `key` stable, `filter` puis `map`, liste vide, `import type` (S10) | [`docs/architecture.md`](../architecture.md), composants et modèles ; [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md), type safety | **Partielle** : le code utilise des `key` stables (`application.id`, `offer.id`) et des états vides, mais le guide ne formule pas ces règles. | Ajouter les règles `key` stable sur l’élément renvoyé par `map`, liste vide et `import type` dans le guide frontend. |
+| `useState`, hooks au premier niveau, état typé, valeurs dérivées non stockées (S11) | [`docs/architecture.md`](../architecture.md), hooks pour l’état prêt à afficher et `useAuth` appelé une fois ; [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md), « type safety » | **Oui pour les hooks, partielle pour l’état** : l’architecture précise l’emplacement des hooks, mais pas les règles d’appel, l’état dérivé ni la forme fonctionnelle du setter. | Ajouter les règles de hooks au premier niveau, d’état minimal et de calcul des valeurs dérivées. |
+| Accessibilité avec `aria-label` et états de contrôle (S11) | [`docs/architecture.md`](../architecture.md), gestion des états de chargement/erreur ; code [`NavBar.tsx`](../../frontend/src/components/NavBar.tsx) avec `aria-label` | **Partielle** : la navigation porte un `aria-label` et les états utilisent `role="alert"`/`role="status"`, mais le guide ne donne pas une règle d’accessibilité systématique. | Ajouter des consignes sur labels de formulaires, boutons nommés, focus/erreurs et attributs ARIA lorsque nécessaires. |
+| Handlers React, événements typés, formulaires contrôlés, `onSubmit`, `preventDefault`, validation HTML (S12) | [`docs/architecture.md`](../architecture.md), services/hooks/pages ; [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md), validation des entrées côté backend | **Partielle** : [`ApplicationForm.tsx`](../../frontend/src/components/ApplicationForm.tsx) utilise `onSubmit` et `preventDefault`, mais importe `FormEvent` plutôt que `SubmitEvent`; le guide ne précise pas les champs contrôlés ni la validation HTML. | Ajouter la convention `handleXxx`, typer les événements React, rappeler que la validation frontend ne remplace jamais le backend et préférer `SubmitEvent` selon les notes actuelles. |
+| État de collection immuable et méthodes non mutantes (S13) | [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md), préserver le comportement et la sûreté des types ; [`docs/architecture.md`](../architecture.md), hooks | **Partielle** : aucun usage de `push`, `splice`, `sort` ou `reverse` n’a été trouvé dans `frontend/src`, mais cette garantie n’est pas écrite dans les guides. | Ajouter explicitement `map`/`filter`/spread et l’interdiction de muter l’état ou les objets parcourus. |
+| État partagé, flux unidirectionnel, lifting state up, source de vérité unique (S14) | [`docs/architecture.md`](../architecture.md), pages → hooks → services et `App.tsx` propriétaire de `useAuth` ; [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md), architecture frontend | **Oui** : l’architecture impose un propriétaire unique de l’authentification et un flux pages/hooks/services. **Partielle** pour le nommage `onXxx` et le placement minimal de l’état. | Ajouter ces conventions de props callback et rappeler de ne pas dupliquer une valeur dérivée dans l’état. |
+| Validation frontend utile mais non substitutive à la validation backend (S12, « Bonnes pratiques transversales ») | [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md), validation des corps dans les contrôleurs ; [`backend/API.md`](../../backend/API.md), erreurs `400 INVALID_BODY` | **Oui** : le guide impose la validation backend et l’API documente les erreurs ; les guards frontend valident les réponses. | Aucun changement indispensable ; préciser que les deux validations ont des objectifs différents si le guide frontend est enrichi. |
+
+### Rapport synthétique et recommandations
+
+L’analyse actualisée montre que les guides couvrent bien l’architecture React/MVVM,
+la séparation frontend/backend, la validation backend, la sécurité serveur et les
+contrats API. Les notes S05-S06 sur le DOM impératif ne sont pas directement
+applicables à ce frontend React : aucune utilisation de `innerHTML`, `querySelector`
+ou `addEventListener` n’a été trouvée.
+
+Les écarts les plus importants concernent les attentes React S07-S14 qui sont
+visibles dans le code mais peu explicites dans les guides : composants et props
+typés, clés stables, règles des hooks, immutabilité de l’état, formulaires contrôlés,
+handlers typés, source de vérité unique et accessibilité. Il ne s’agit pas de
+contradictions ; ce sont surtout des règles à préciser pour guider un agent avant
+qu’un linter ou un test ne signale un problème. La seule réserve concrète relevée est
+l’usage de `FormEvent` dans `ApplicationForm.tsx`, alors que les notes actuelles
+indiquent `SubmitEvent`.
+
+Recommandations prioritaires : ajouter au guide frontend les règles d’état immuable,
+de hooks au premier niveau, de `key` stable, de validation frontend complémentaire,
+de formulaires contrôlés et d’accessibilité ; ajouter la protection XSS spécifique à
+React (`dangerouslySetInnerHTML`) ; ne pas ajouter de règles DOM ou MUI qui ne
+correspondent pas à la technologie actuellement utilisée.
+
+Cet audit met à jour le rapport uniquement. Les guides de développement n’ont pas été
+modifiés.
