@@ -26,6 +26,17 @@ const applications = [
     status: "REJECTED",
     appliedAt: "2026-09-30 10:30:00",
   },
+  {
+    id: 3,
+    offerId: 5,
+    title: "Tableau de bord de qualité des données",
+    companyShortName: "Lumen Data",
+    academicYear: "2026-2027",
+    period: "OTHER",
+    message: null,
+    status: "SELECTED",
+    appliedAt: "2026-09-28 09:00:00",
+  },
 ];
 
 describe("ApplicationsPage", () => {
@@ -38,6 +49,7 @@ describe("ApplicationsPage", () => {
     render(<ApplicationsPage token="jeton" onUnauthorized={vi.fn()} />);
 
     expect(await screen.findByText("En cours")).toBeInTheDocument();
+    expect(screen.getByText("Retenue")).toBeInTheDocument();
     expect(screen.getByText("Non retenue")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Retirer" }));
 

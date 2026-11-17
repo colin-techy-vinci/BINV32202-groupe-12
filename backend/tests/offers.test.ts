@@ -50,6 +50,44 @@ describe("GET /offers : visibilité selon le profil", () => {
     });
   });
 
+  describe("GET /offers : recherche par titre", () => {
+    const search = (query: string, token = tokenFor("ADMIN", ADMINISTRATOR.ANNE_LECLERCQ)) =>
+      request(app)
+        .get(`/offers?q=${encodeURIComponent(query)}`)
+        .set("Authorization", token);
+
+    it("recherche une expression entière dans le titre sans distinguer la casse", async () => {
+      const response = await search("  PORTAIL CLIENT  ");
+
+      expect(response.status).toBe(200);
+      expect(offerIds(response.body)).toEqual([OFFER.CLIENT_PORTAL]);
+    });
+
+    it("retourne une liste vide sans correspondance", async () => {
+      const response = await search("titre inexistant");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([]);
+    });
+
+    it("ignore une recherche vide", async () => {
+      const response = await search("   ");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveLength(10);
+    });
+
+    it("conserve la visibilité publiée pour un étudiant", async () => {
+      const response = await search("application", tokenFor("STUDENT", STUDENT.LUCAS_DUPONT));
+
+      expect(response.status).toBe(200);
+      expect(offerIds(response.body)).toEqual([OFFER.FLEET_APP]);
+      expect(response.body.every((offer: { status: string }) => offer.status === "PUBLISHED")).toBe(
+        true,
+      );
+    });
+  });
+
   it("ne montre que les offres publiées à un étudiant", async () => {
     const response = await listOffersAs("STUDENT", STUDENT.LUCAS_DUPONT);
 
