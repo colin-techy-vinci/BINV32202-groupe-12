@@ -1,0 +1,133 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Install Playwright Chromium",
+			"type": "shell",
+			"command": "npx.cmd",
+			"args": [
+				"playwright",
+				"install",
+				"chromium"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Install Playwright revision 1200",
+			"type": "shell",
+			"command": "npx.cmd",
+			"args": [
+				"--yes",
+				"--package=playwright@1.57.1",
+				"playwright",
+				"install",
+				"chromium"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Install Playwright 1.57",
+			"type": "shell",
+			"command": "npx.cmd",
+			"args": [
+				"--yes",
+				"--package=playwright@1.57.0",
+				"playwright",
+				"install",
+				"chromium"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Reset Gesta demo database",
+			"type": "shell",
+			"command": "npm.cmd",
+			"args": [
+				"run",
+				"db:reset"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Validate Playwright configuration",
+			"type": "shell",
+			"command": "npx.cmd",
+			"args": [
+				"playwright",
+				"test",
+				"--list"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run offer search Playwright tests",
+			"type": "shell",
+			"command": "npx.cmd",
+			"args": [
+				"playwright",
+				"test",
+				"e2e/recherche-offres/recherche-offres.spec.ts",
+				"--project=chromium",
+				"--reporter=line"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Start Gesta servers",
+			"type": "shell",
+			"command": "npm.cmd",
+			"args": [
+				"run",
+				"dev"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run search E2E tests with servers",
+			"type": "shell",
+			"command": "npx.cmd",
+			"args": [
+				"playwright",
+				"test",
+				"e2e/recherche-offres/recherche-offres.spec.ts",
+				"--project=chromium",
+				"--reporter=line"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run search E2E tests localhost",
+			"type": "shell",
+			"command": "npx.cmd",
+			"args": [
+				"playwright",
+				"test",
+				"e2e/recherche-offres/recherche-offres.spec.ts",
+				"--project=chromium",
+				"--reporter=line"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Stop Gesta E2E servers",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"$ports = 3000,5173; foreach ($port in $ports) { $connections = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue; foreach ($processId in ($connections.OwningProcess | Sort-Object -Unique)) { Stop-Process -Id $processId -Force } }"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}
